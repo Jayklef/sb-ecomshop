@@ -3,7 +3,10 @@ package com.ecom.ecomshop.service;
 import com.ecom.ecomshop.exceptions.APIException;
 import com.ecom.ecomshop.exceptions.ResourceNotFoundException;
 import com.ecom.ecomshop.model.Category;
+import com.ecom.ecomshop.payload.CategoryDTO;
+import com.ecom.ecomshop.payload.CategoryResponse;
 import com.ecom.ecomshop.repositories.CategoryRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,22 +17,35 @@ public class CategoryServiceImpl implements CategoryService{
 
     @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private ModelMapper modelMapper
 
     @Override
-    public List<Category> getAllCategories() {
+    public CategoryResponse getAllCategories() {
         List<Category> categories = categoryRepository.findAll();
         if (categories.isEmpty())
             throw new APIException("No category created till now. ");
-        return categories;
+
+        List<CategoryDTO> categoryDTOS = categories.stream()
+                .map(category -> modelMapper.map(category, CategoryDTO.class))
+                .toList();
+
+        CategoryResponse categoryResponse = new CategoryResponse();
+        categoryResponse.setContent(categoryDTOS);
+        return categoryResponse;
     }
 
     @Override
-    public void createCategory(Category category) {
-        Category savedCategory = categoryRepository.findByCategoryName(category.getCategoryName());
+    public CategoryDTO createCategory(CategoryDTo categoryDTO) {
 
-        if (savedCategory != null)
+        Category category = modelMapper.map(CategoryDTO, Category.class);
+
+        Category categoryFromBD = categoryRepository.findByCategoryName(category.getCategoryName());
+
+        if (categoryFromBD != null)
             throw new APIException("Category with the name " + category.getCategoryName() + "already exists !!!");
-        categoryRepository.save(category);
+        Category savedCategory = categoryRepository.save(category);
+        return modelMapper.map(savedCategory, Category.class);
     }
 
     @Override

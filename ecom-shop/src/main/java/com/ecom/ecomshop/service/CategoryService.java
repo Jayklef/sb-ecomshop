@@ -1,13 +1,15 @@
 package com.ecom.ecomshop.service;
 
 import com.ecom.ecomshop.model.Category;
+import com.ecom.ecomshop.payload.CategoryResponse;
 
 import java.util.List;
 
 public interface CategoryService {
 
-    List<Category> getAllCategories();
-    void createCategory(Category category);
+    CategoryResponse getAllCategories();
+
+    CategoryDTO createCategory(CategoryDTO categoryDTO);
 
     String deleteCategory(Long categoryId);
 
