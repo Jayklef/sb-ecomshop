@@ -1,9 +1,8 @@
 package com.ecom.ecomshop.service;
 
 import com.ecom.ecomshop.model.Category;
+import com.ecom.ecomshop.payload.CategoryDTO;
 import com.ecom.ecomshop.payload.CategoryResponse;
-
-import java.util.List;
 
 public interface CategoryService {
 
@@ -11,7 +10,7 @@ public interface CategoryService {
 
     CategoryDTO createCategory(CategoryDTO categoryDTO);
 
-    String deleteCategory(Long categoryId);
+    CategoryDTO deleteCategory(Long categoryId);
 
-    Category updateCategory(Long categoryId, Category category);
+    CategoryDTO updateCategory(Long categoryId, CategoryDTO categoryDTO);
 }
