@@ -1,5 +1,6 @@
 package com.ecom.ecomshop.service;
 
+import com.ecom.ecomshop.exceptions.APIException;
 import com.ecom.ecomshop.exceptions.ResourceNotFoundException;
 import com.ecom.ecomshop.model.Category;
 import com.ecom.ecomshop.model.Product;
@@ -53,15 +54,19 @@ public class ProductServiceImpl implements ProductService{
             }
         }
 
-        Product product = modelMapper.map(productDTO, Product.class);
-        product.setImage("default png");
-        product.setCategory(category);
-        double specialPrice = product.getPrice() -
-                ((product.getDiscount() * 0.01) * product.getPrice());
+        if (isProductNotPresent) {
+            Product product = modelMapper.map(productDTO, Product.class);
+            product.setImage("default png");
+            product.setCategory(category);
+            double specialPrice = product.getPrice() -
+                    ((product.getDiscount() * 0.01) * product.getPrice());
 
-        product.setSpecialPrice(specialPrice);
-        Product savedProduct = productRepository.save(product);
-        return modelMapper.map(savedProduct, ProductDTO.class);
+            product.setSpecialPrice(specialPrice);
+            Product savedProduct = productRepository.save(product);
+            return modelMapper.map(savedProduct, ProductDTO.class);
+        } else {
+            throw new APIException("Product already exists!!");
+        }
     }
 
     @Override
@@ -71,6 +76,9 @@ public class ProductServiceImpl implements ProductService{
                 .map(product -> modelMapper.map(product, ProductDTO.class))
                 .toList();
 
+        if (products.isEmpty()){
+            throw new APIException("No product found");
+        }
         ProductResponse productResponse = new ProductResponse();
         productResponse.setContent(productDTOS);
         return productResponse;
