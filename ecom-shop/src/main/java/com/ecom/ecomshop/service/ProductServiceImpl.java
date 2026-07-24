@@ -43,6 +43,15 @@ public class ProductServiceImpl implements ProductService{
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(()-> new ResourceNotFoundException("Category", "categoryId", categoryId));
 
+        boolean isProductNotPresent = true;
+
+        List<Product> products = category.getProducts();
+        for (Product value : products) {
+            if (value.getProductName().equals(productDTO.getProductName())) {
+                isProductNotPresent = false;
+                break;
+            }
+        }
 
         Product product = modelMapper.map(productDTO, Product.class);
         product.setImage("default png");
